@@ -276,6 +276,27 @@ async def log_embed(guild, title, desc, colour=0x90A4AE, file=None):
         log.warning("log send failed: %s", e)
 
 
+
+async def who(guild, action, target_id=None, extra_ok=None):
+    """Return a 'by: @user' line from the audit log (empty if unknown)."""
+    await asyncio.sleep(1.5)
+    try:
+        now = discord.utils.utcnow()
+        async for en in guild.audit_logs(limit=15, action=action):
+            if (now - en.created_at).total_seconds() > 20:
+                continue
+            if target_id is not None and getattr(en.target, "id", None) != target_id:
+                continue
+            if extra_ok and not extra_ok(en):
+                continue
+            u = en.user
+            reason = f"\n📄 السبب: {en.reason}" if en.reason else ""
+            return f"\n👤 بواسطة: {u.mention if u else '؟'}{reason}", en
+    except Exception as e:
+        log.warning("audit lookup failed: %s", e)
+    return "", None
+
+
 # ---------------------------------------------------------------- invites
 INVITES = {}
 
@@ -407,8 +428,10 @@ async def on_message(msg):
 @client.event
 async def on_message_delete(msg):
     if msg.guild and not msg.author.bot:
+        by, _ = await who(msg.guild, discord.AuditLogAction.message_delete, msg.author.id,
+                          lambda en: getattr(en.extra, "channel", None) and en.extra.channel.id == msg.channel.id)
         await log_embed(msg.guild, "🗑️ رسالة اتمسحت",
-                        f"من: {msg.author.mention}\nفي: {msg.channel.mention}\n{(msg.content or '—')[:1500]}", 0xFF9800)
+                        f"من: {msg.author.mention}\nفي: {msg.channel.mention}\n{(msg.content or '—')[:1500]}{by}", 0xFF9800)
 
 
 @client.event
@@ -451,17 +474,23 @@ async def on_member_join(member):
 
 @client.event
 async def on_member_remove(member):
-    await log_embed(member.guild, "📤 عضو خرج", f"{member} (`{member.id}`)", 0xFF7043)
+    by, en = await who(member.guild, discord.AuditLogAction.kick, member.id)
+    if en:
+        await log_embed(member.guild, "👢 كيك", f"{member} (`{member.id}`){by}", 0xFF7043)
+    else:
+        await log_embed(member.guild, "📤 عضو خرج", f"{member} (`{member.id}`)", 0xFF7043)
 
 
 @client.event
 async def on_member_ban(guild, user):
-    await log_embed(guild, "🔨 باند", f"{user} (`{user.id}`)", 0xD50000)
+    by, _ = await who(guild, discord.AuditLogAction.ban, user.id)
+    await log_embed(guild, "🔨 باند", f"{user} (`{user.id}`){by}", 0xD50000)
 
 
 @client.event
 async def on_member_unban(guild, user):
-    await log_embed(guild, "♻️ فك باند", f"{user} (`{user.id}`)", 0x00C853)
+    by, _ = await who(guild, discord.AuditLogAction.unban, user.id)
+    await log_embed(guild, "♻️ فك باند", f"{user} (`{user.id}`){by}", 0x00C853)
 
 
 @client.event
@@ -470,11 +499,14 @@ async def on_member_update(before, after):
     if before.roles != after.roles:
         added = [r.mention for r in after.roles if r not in before.roles]
         removed = [r.mention for r in before.roles if r not in after.roles]
-        await log_embed(g, "🎭 تغيير رتب", f"{after.mention}\n➕ {' '.join(added) or '—'}\n➖ {' '.join(removed) or '—'}", 0x7C4DFF)
+        by, _ = await who(g, discord.AuditLogAction.member_role_update, after.id)
+        await log_embed(g, "🎭 تغيير رتب", f"{after.mention}\n➕ {' '.join(added) or '—'}\n➖ {' '.join(removed) or '—'}{by}", 0x7C4DFF)
     if before.timed_out_until != after.timed_out_until:
-        await log_embed(g, "⏱️ تايم آوت", f"{after.mention}: {after.timed_out_until or 'اتشال'}", 0xFFAB00)
+        by, _ = await who(g, discord.AuditLogAction.member_update, after.id)
+        await log_embed(g, "⏱️ تايم آوت", f"{after.mention}: {after.timed_out_until or 'اتشال'}{by}", 0xFFAB00)
     if before.nick != after.nick:
-        await log_embed(g, "📝 تغيير اسم", f"{after.mention}: {before.nick} ← {after.nick}", 0x90A4AE)
+        by, _ = await who(g, discord.AuditLogAction.member_update, after.id)
+        await log_embed(g, "📝 تغيير اسم", f"{after.mention}: {before.nick} ← {after.nick}{by}", 0x90A4AE)
 
 
 @client.event
@@ -492,22 +524,62 @@ async def on_voice_state_update(member, before, after):
 
 @client.event
 async def on_guild_channel_create(ch):
-    await log_embed(ch.guild, "➕ قناة جديدة", ch.mention if hasattr(ch, "mention") else ch.name, 0x00E676)
+    by, _ = await who(ch.guild, discord.AuditLogAction.channel_create, ch.id)
+    await log_embed(ch.guild, "➕ قناة جديدة", f"{ch.mention if hasattr(ch, 'mention') else ch.name}{by}", 0x00E676)
 
 
 @client.event
 async def on_guild_channel_delete(ch):
-    await log_embed(ch.guild, "➖ قناة اتمسحت", ch.name, 0xFF5252)
+    by, _ = await who(ch.guild, discord.AuditLogAction.channel_delete, ch.id)
+    await log_embed(ch.guild, "➖ قناة اتمسحت", f"{ch.name}{by}", 0xFF5252)
+
+
+@client.event
+async def on_guild_channel_update(before, after):
+    changes = []
+    if before.name != after.name:
+        changes.append(f"الاسم: {before.name} ← {after.name}")
+    if before.category != after.category:
+        changes.append(f"الكاتيجوري: {before.category} ← {after.category}")
+    if before.overwrites != after.overwrites:
+        changes.append("الصلاحيات اتغيرت")
+    if not changes:
+        return
+    by, en = await who(after.guild, discord.AuditLogAction.channel_update, after.id)
+    if en is None:
+        by, en = await who(after.guild, discord.AuditLogAction.overwrite_update, after.id)
+    if en and en.user and en.user.id == client.user.id:
+        return  # skip the bot's own /setup edits
+    await log_embed(after.guild, "🛠️ تعديل قناة", f"{after.mention if hasattr(after, 'mention') else after.name}\n" + "\n".join(changes) + by, 0xFFC107)
 
 
 @client.event
 async def on_guild_role_create(role):
-    await log_embed(role.guild, "➕ رتبة جديدة", role.name, 0x00E676)
+    by, _ = await who(role.guild, discord.AuditLogAction.role_create, role.id)
+    await log_embed(role.guild, "➕ رتبة جديدة", f"{role.name}{by}", 0x00E676)
 
 
 @client.event
 async def on_guild_role_delete(role):
-    await log_embed(role.guild, "➖ رتبة اتمسحت", role.name, 0xFF5252)
+    by, _ = await who(role.guild, discord.AuditLogAction.role_delete, role.id)
+    await log_embed(role.guild, "➖ رتبة اتمسحت", f"{role.name}{by}", 0xFF5252)
+
+
+@client.event
+async def on_guild_role_update(before, after):
+    changes = []
+    if before.name != after.name:
+        changes.append(f"الاسم: {before.name} ← {after.name}")
+    if before.permissions != after.permissions:
+        changes.append("الصلاحيات اتغيرت")
+    if before.colour != after.colour:
+        changes.append("اللون اتغير")
+    if not changes:
+        return
+    by, en = await who(after.guild, discord.AuditLogAction.role_update, after.id)
+    if en and en.user and en.user.id == client.user.id:
+        return  # skip the bot's own /setup edits
+    await log_embed(after.guild, "🛠️ تعديل رتبة", f"{after.mention}\n" + "\n".join(changes) + by, 0xFFC107)
 
 
 # ---------------------------------------------------------------- reaction role
