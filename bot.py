@@ -111,7 +111,10 @@ def build_overwrites(guild, access, roles):
         ow[gaming] = P(view_channel=True, connect=True, speak=True, stream=True)
         ow[staff] = P(view_channel=True, connect=True, speak=True)
     elif access == "public_voice":
-        ow[member] = P(view_channel=True, connect=True, speak=True, stream=True, use_voice_activation=True)
+        pv = dict(view_channel=True, connect=True, speak=True, stream=True, use_voice_activation=True)
+        ow[ev] = P(**pv)
+        for r in others:
+            ow[r] = P(**pv)
     elif access == "spare":
         ow[member] = P(view_channel=True, connect=False)
         ow[staff] = P(view_channel=True, connect=True, speak=True)
