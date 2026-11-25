@@ -101,23 +101,20 @@ def build_overwrites(guild, access, roles):
         for r in others:
             ow[r] = P(view_channel=False)
     elif access == "record":
-        ow[ev] = P(view_channel=False)
+        # visible to all, nobody can connect; only Pixel (admin) moves people in
+        ow[ev] = P(view_channel=True, connect=False)
         for r in others:
-            ow[r] = P(view_channel=False, connect=False)
-        ow[staff] = P(view_channel=True, connect=True, speak=True, stream=False, use_embedded_activities=False)
-        ow[pixel] = P(view_channel=True, connect=True, speak=True, stream=False)
+            ow[r] = P(view_channel=True, connect=False)
     elif access == "gaming_voice":
-        ow[member] = P(view_channel=True, connect=False)
-        ow[gaming] = P(view_channel=True, connect=True, speak=True, stream=True)
-        ow[staff] = P(view_channel=True, connect=True, speak=True)
-    elif access == "public_voice":
-        pv = dict(view_channel=True, connect=True, speak=True, stream=True, use_voice_activation=True)
-        ow[ev] = P(**pv)
-        for r in others:
-            ow[r] = P(**pv)
-    elif access == "spare":
-        ow[member] = P(view_channel=True, connect=False)
-        ow[staff] = P(view_channel=True, connect=True, speak=True)
+        # visible to all, only Gaming can connect
+        ow[ev] = P(view_channel=True, connect=False)
+        for r in (roles["creator"], roles["friends"], member, staff):
+            ow[r] = P(view_channel=True, connect=False)
+        ow[gaming] = P(view_channel=True, connect=True, speak=True, stream=True, use_voice_activation=True)
+    elif access in ("public_voice", "spare"):
+        # open to Member holders only
+        ow[ev] = P(view_channel=False, connect=False)
+        ow[member] = P(view_channel=True, connect=True, speak=True, stream=True, use_voice_activation=True)
     if access != "readonly" and access != "chat":
         pass
     ow[pixel] = ow.get(pixel) or P(view_channel=True)
