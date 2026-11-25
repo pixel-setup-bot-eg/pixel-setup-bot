@@ -160,6 +160,32 @@ async def ensure_roles(guild):
     return roles
 
 
+NOTIFY_KEYS = {"tiktok", "youtube", "facebook", "instagram", "kick"}
+NOTIFY_PERMS = discord.PermissionOverwrite(view_channel=True, send_messages=True, embed_links=True, attach_files=True)
+
+
+def notify_bots(guild):
+    """Bot members whose name looks like NotifyMe."""
+    return [m for m in guild.members if m.bot and "notifyme" in re.sub(r"[^a-z0-9]", "", m.name.lower() + m.display_name.lower())]
+
+
+async def apply_notify(guild):
+    bots = notify_bots(guild)
+    if not bots:
+        log.info("NotifyMe not found; bots here: %s", [m.name for m in guild.members if m.bot])
+        return
+    for key in NOTIFY_KEYS:
+        c = get_channel(guild, key)
+        if not c:
+            continue
+        for nb in bots:
+            try:
+                await c.set_permissions(nb, overwrite=NOTIFY_PERMS, reason="Pixel setup bot: NotifyMe access")
+            except discord.HTTPException as e:
+                log.warning("notify perms %s: %s", c.name, e)
+    log.info("NotifyMe access set for %s", [m.name for m in bots])
+
+
 async def ensure_layout(guild, roles):
     st = gstate(guild)
     for block in CFG["layout"]:
@@ -169,6 +195,9 @@ async def ensure_layout(guild, roles):
         for ch in block["channels"]:
             access = ch["access"]
             ow = build_overwrites(guild, access, roles)
+            if ch["key"] in NOTIFY_KEYS:
+                for nb in notify_bots(guild):
+                    ow[nb] = NOTIFY_PERMS
             existing = guild.get_channel(st["channels"].get(ch["key"], 0)) or discord.utils.get(
                 guild.text_channels if ch["type"] == "text" else guild.voice_channels, name=ch["name"].lower() if ch["type"] == "text" else ch["name"])
             if existing is None:
@@ -640,6 +669,7 @@ async def on_ready():
         except Exception as e:
             log.warning("sync %s: %s", g.id, e)
         await cache_invites(g)
+        await apply_notify(g)
         log.info("guild %s ready", g.name)
 
 
