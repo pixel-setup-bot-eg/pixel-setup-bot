@@ -186,6 +186,33 @@ async def apply_notify(guild):
     log.info("NotifyMe access set for %s", [m.name for m in bots])
 
 
+async def apply_voice_layout(guild):
+    """Move existing voice channels into their configured categories (permissions untouched)."""
+    st = gstate(guild)
+    for i, block in enumerate(CFG["layout"]):
+        if not any(c["type"] == "voice" for c in block["channels"]):
+            continue
+        cat = discord.utils.get(guild.categories, name=block["category"])
+        for ch in block["channels"]:
+            existing = guild.get_channel(st["channels"].get(ch["key"], 0)) or discord.utils.get(guild.voice_channels, name=ch["name"])
+            if existing is None or (existing.category and existing.category.name == block["category"]):
+                continue
+            try:
+                if cat is None:
+                    cat = await guild.create_category(block["category"], reason="Pixel setup bot")
+                await existing.edit(category=cat, sync_permissions=False, reason="Pixel setup bot: voice layout")
+                st["channels"][ch["key"]] = existing.id
+                log.info("moved %s to %s", existing.name, cat.name)
+            except discord.HTTPException as e:
+                log.warning("move %s: %s", ch["name"], e)
+        if cat:
+            try:
+                await cat.edit(position=i)
+            except discord.HTTPException:
+                pass
+    save_state(STATE)
+
+
 async def ensure_layout(guild, roles):
     st = gstate(guild)
     for block in CFG["layout"]:
@@ -670,6 +697,7 @@ async def on_ready():
             log.warning("sync %s: %s", g.id, e)
         await cache_invites(g)
         await apply_notify(g)
+        await apply_voice_layout(g)
         log.info("guild %s ready", g.name)
 
 
