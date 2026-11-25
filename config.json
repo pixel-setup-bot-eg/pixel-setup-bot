@@ -236,7 +236,12 @@
      "type": "voice",
      "name": "🔊｜الصوت العام",
      "access": "public_voice"
-    },
+    }
+   ]
+  },
+  {
+   "category": "🎧｜غرف إضافية",
+   "channels": [
     {
      "key": "vc_spare1",
      "type": "voice",
