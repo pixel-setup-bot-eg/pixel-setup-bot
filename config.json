@@ -98,7 +98,11 @@
     "use_external_emojis",
     "use_application_commands",
     "change_nickname",
-    "create_instant_invite"
+    "create_instant_invite",
+    "connect",
+    "speak",
+    "stream",
+    "use_voice_activation"
    ]
   }
  ],
