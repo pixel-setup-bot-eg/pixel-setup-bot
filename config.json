@@ -1,0 +1,283 @@
+{
+ "owner_name": "Pixel",
+ "timeout_days": 3,
+ "image_flood_min": 4,
+ "block_non_media_files": true,
+ "scam_keywords": [
+  "mrbeast",
+  "mr beast",
+  "mr. beast",
+  "free nitro",
+  "nitro gift",
+  "steam gift",
+  "airdrop",
+  "claim your",
+  "claim now",
+  "you have been selected",
+  "you won",
+  "withdraw",
+  "crypto giveaway",
+  "giveaway ends",
+  "double your",
+  "bitcoin",
+  "usdt",
+  "metamask",
+  "wallet connect"
+ ],
+ "roles": [
+  {
+   "key": "pixel",
+   "name": "Pixel",
+   "color": "#FF3D81",
+   "hoist": true,
+   "admin": true
+  },
+  {
+   "key": "staff",
+   "name": "Staff",
+   "color": "#FFB300",
+   "hoist": true,
+   "perms": [
+    "view_channel",
+    "send_messages",
+    "send_messages_in_threads",
+    "embed_links",
+    "attach_files",
+    "add_reactions",
+    "read_message_history",
+    "use_external_emojis",
+    "manage_messages",
+    "moderate_members",
+    "kick_members",
+    "manage_nicknames",
+    "view_audit_log",
+    "create_instant_invite",
+    "connect",
+    "speak",
+    "stream",
+    "use_voice_activation",
+    "mute_members",
+    "deafen_members",
+    "move_members",
+    "mention_everyone",
+    "use_application_commands",
+    "change_nickname"
+   ]
+  },
+  {
+   "key": "creator",
+   "name": "Content Creator",
+   "color": "#00E5FF",
+   "hoist": true,
+   "perms": []
+  },
+  {
+   "key": "friends",
+   "name": "Friends",
+   "color": "#76FF03",
+   "hoist": true,
+   "perms": []
+  },
+  {
+   "key": "gaming",
+   "name": "Gaming",
+   "color": "#7C4DFF",
+   "hoist": false,
+   "mentionable": true,
+   "perms": []
+  },
+  {
+   "key": "member",
+   "name": "Member",
+   "color": "#B0BEC5",
+   "hoist": false,
+   "perms": [
+    "view_channel",
+    "read_message_history",
+    "add_reactions",
+    "use_external_emojis",
+    "use_application_commands",
+    "change_nickname",
+    "create_instant_invite"
+   ]
+  }
+ ],
+ "layout": [
+  {
+   "category": "☪️｜ذكر الله",
+   "channels": [
+    {
+     "key": "dhikr",
+     "type": "text",
+     "name": "🤍｜صلي-على-النبي-واذكر-الله",
+     "access": "readonly"
+    }
+   ]
+  },
+  {
+   "category": "📌｜ابدأ من هنا",
+   "channels": [
+    {
+     "key": "welcome",
+     "type": "text",
+     "name": "👋｜أهلاً-بيك",
+     "access": "readonly"
+    },
+    {
+     "key": "invites",
+     "type": "text",
+     "name": "📥｜مين-دخل",
+     "access": "readonly"
+    },
+    {
+     "key": "rules",
+     "type": "text",
+     "name": "📜｜القوانين-والرتب",
+     "access": "readonly"
+    },
+    {
+     "key": "collect",
+     "type": "text",
+     "name": "🎁｜استلم-رتبتك",
+     "access": "readonly"
+    },
+    {
+     "key": "ticket",
+     "type": "text",
+     "name": "🎫｜تيكت",
+     "access": "locked"
+    }
+   ]
+  },
+  {
+   "category": "📣｜الإشعارات",
+   "channels": [
+    {
+     "key": "tiktok",
+     "type": "text",
+     "name": "🎵｜تيك-توك",
+     "access": "locked"
+    },
+    {
+     "key": "youtube",
+     "type": "text",
+     "name": "▶️｜يوتيوب",
+     "access": "locked"
+    },
+    {
+     "key": "facebook",
+     "type": "text",
+     "name": "📘｜فيسبوك",
+     "access": "locked"
+    },
+    {
+     "key": "instagram",
+     "type": "text",
+     "name": "📸｜انستجرام",
+     "access": "locked"
+    },
+    {
+     "key": "kick",
+     "type": "text",
+     "name": "🟢｜كيك",
+     "access": "locked"
+    }
+   ]
+  },
+  {
+   "category": "💬｜المجتمع",
+   "channels": [
+    {
+     "key": "chat",
+     "type": "text",
+     "name": "💬｜الشات-العام",
+     "access": "chat"
+    }
+   ]
+  },
+  {
+   "category": "🛡️｜الإدارة",
+   "channels": [
+    {
+     "key": "log",
+     "type": "text",
+     "name": "📋｜log",
+     "access": "pixel_only"
+    }
+   ]
+  },
+  {
+   "category": "🎙️｜الصوت",
+   "channels": [
+    {
+     "key": "vc_private",
+     "type": "voice",
+     "name": "🔒｜غرفة Pixel",
+     "access": "pixel_only"
+    },
+    {
+     "key": "vc_record",
+     "type": "voice",
+     "name": "🔴｜Record",
+     "access": "record"
+    },
+    {
+     "key": "vc_gaming",
+     "type": "voice",
+     "name": "🎮｜Gaming",
+     "access": "gaming_voice"
+    },
+    {
+     "key": "vc_public",
+     "type": "voice",
+     "name": "🔊｜الصوت العام",
+     "access": "public_voice"
+    },
+    {
+     "key": "vc_spare1",
+     "type": "voice",
+     "name": "🎧｜غرفة 1",
+     "access": "spare"
+    },
+    {
+     "key": "vc_spare2",
+     "type": "voice",
+     "name": "🎧｜غرفة 2",
+     "access": "spare"
+    },
+    {
+     "key": "vc_spare3",
+     "type": "voice",
+     "name": "🎧｜غرفة 3",
+     "access": "spare"
+    },
+    {
+     "key": "vc_spare4",
+     "type": "voice",
+     "name": "🎧｜غرفة 4",
+     "access": "spare"
+    }
+   ]
+  }
+ ],
+ "messages": {
+  "dhikr_banner": "# صلي على النبي ﷺ\n## واذكر الله\nسبحان الله وبحمده، سبحان الله العظيم 🤍",
+  "welcome": "أهلاً بيك يا {user} في سيرفر **{guild}** 🔥\nإنت العضو رقم **{count}**.\nاقرا القوانين في {rules}، وخد رتبتك من {collect}، وتعالى اتكلم في {chat}.",
+  "invite_known": "👋 {user} دخل السيرفر\n📨 دعاه: **{inviter}** (عدد دعواته: {uses})",
+  "invite_unknown": "👋 {user} دخل السيرفر\n📨 مش قادر أعرف مين دعاه",
+  "rules_title": "📜 قوانين السيرفر",
+  "rules_body": "1. احترام الكل، ممنوع الشتيمة والتنمر.\n2. ممنوع اللينكات والإعلانات والسبام.\n3. ممنوع النصب وروابط الجوائز المزيفة (زي MrBeast وغيره).\n4. ممنوع رمي صور كتير ورا بعض.\n5. الكلام في الشات العام بس، والصوت في الصوت العام.\n\n⚠️ المخالفة = مسح الرسالة + تايم آوت {days} أيام.",
+  "roles_title": "🎭 الرتب",
+  "roles_body": "**Pixel**: صاحب السيرفر\n**Staff**: الإدارة والمشرفين\n**Content Creator**: صناع المحتوى\n**Friends**: أصحاب Pixel\n**Gaming**: ناس الألعاب، تتمنشن لما في لعب\n**Member**: كل الأعضاء (بتاخدها أوتوماتيك أول ما تدخل)",
+  "collect_text": "## 🎮 عايز تلعب معانا؟\nاضغط ❤️ على الرسالة دي وهتاخد رتبة **Gaming** أوتوماتيك.\nشيل الـ ❤️ لو عايز تتشال منها.",
+  "dm_warning": "⚠️ رسالتك في **{guild}** اتمسحت.\nالسبب: **{what}**.\nده ممنوع في السيرفر، وإنت اتعمللك تايم آوت **{days} أيام**.",
+  "labels": {
+   "link": "نشرت لينك",
+   "scam": "نشرت سبام/نصب",
+   "images": "نشرت صور سبام",
+   "file": "رفعت ملف ممنوع",
+   "mentions": "منشن جماعي",
+   "repeat": "تكرار رسايل"
+  }
+ }
+}
